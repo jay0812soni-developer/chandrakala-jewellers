@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'core/theme/app_theme.dart';
+import 'features/cart/bloc/cart_bloc.dart';
+import 'features/catalogue/bloc/catalogue_bloc.dart';
+import 'features/catalogue/bloc/catalogue_event.dart';
+import 'features/catalogue/repository/catalogue_repository.dart';
+import 'features/catalogue/views/catalogue_view.dart';
+import 'features/cart/views/cart_view.dart';
+import 'features/checkout/views/checkout_view.dart';
+import 'features/gallery/bloc/gallery_bloc.dart';
+import 'features/gallery/bloc/gallery_event.dart';
+import 'features/gallery/models/jewellery_item.dart';
+import 'features/gallery/repository/gallery_repository.dart';
+import 'features/gallery/views/gallery_view.dart';
+import 'features/home/views/home_view.dart';
+import 'features/product_detail/views/product_detail_view.dart';
+import 'features/rates/bloc/rates_bloc.dart';
+import 'features/rates/bloc/rates_event.dart';
+import 'features/rates/repository/rates_repository.dart';
+
+final GoRouter _router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const HomeView(),
+    ),
+    GoRoute(
+      path: '/gallery',
+      builder: (context, state) => const GalleryView(),
+    ),
+    GoRoute(
+      path: '/catalogue',
+      builder: (context, state) => const CatalogueView(),
+    ),
+    GoRoute(
+      path: '/product/:id',
+      builder: (context, state) {
+        final item = state.extra as JewelleryItem?;
+        if (item == null) {
+          return const Scaffold(body: Center(child: Text('Product not found')));
+        }
+        return ProductDetailView(item: item);
+      },
+    ),
+    GoRoute(
+      path: '/cart',
+      builder: (context, state) => const CartView(),
+    ),
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) => const CheckoutView(),
+    ),
+  ],
+);
+
+class CJApp extends StatelessWidget {
+  const CJApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (_) => RatesRepository()),
+        RepositoryProvider(create: (_) => GalleryRepository()),
+        RepositoryProvider(create: (_) => CatalogueRepository()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => RatesBloc(
+              repository: context.read<RatesRepository>(),
+            )..add(const FetchRatesEvent()),
+          ),
+          BlocProvider(
+            create: (context) => GalleryBloc(
+              repository: context.read<GalleryRepository>(),
+            )..add(const LoadGalleryEvent()),
+          ),
+          BlocProvider(
+            create: (context) => CatalogueBloc(
+              repository: context.read<CatalogueRepository>(),
+            )..add(const LoadCatalogueEvent()),
+          ),
+          BlocProvider(
+            create: (_) => CartBloc(),
+          ),
+        ],
+        child: MaterialApp.router(
+          title: 'ChandraKala Jewellers',
+          theme: AppTheme.lightTheme,
+          routerConfig: _router,
+          debugShowCheckedModeBanner: false,
+        ),
+      ),
+    );
+  }
+}
