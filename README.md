@@ -98,6 +98,16 @@ frontend/
 
 ---
 
+## ⚡ Vercel CI/CD Pipeline
+
+The GitHub repository is connected directly to Vercel:
+- **Automatic Deployments**: Every `git push` to `main` triggers Vercel CI/CD.
+- **Build Script (`build.sh`)**: Automatically clones Flutter stable, runs `flutter pub get`, and executes `flutter build web --release` with the production backend API URL.
+- **SPA Routing (`vercel.json`)**: Configured with rewrites to route deep URLs directly to `index.html` without 404 errors.
+- **Zero Prebuilt Files in Git**: No compiled artifacts are stored in the repo; all builds are dynamically generated in the CI/CD pipeline.
+
+---
+
 ## 📱 Tech Stack
 
 | Technology | Purpose |

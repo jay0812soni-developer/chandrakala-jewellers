@@ -4,6 +4,6 @@
   "private": true,
   "description": "ChandraKala Jewellers Flutter Web frontend on Vercel",
   "scripts": {
-    "build": "echo 'Serving prebuilt production Flutter Web artifacts from public/'"
+    "build": "bash build.sh"
   }
 }
