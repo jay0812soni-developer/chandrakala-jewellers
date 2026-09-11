@@ -1,0 +1,9 @@
+{
+  "name": "chandrakala-jewellers-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ChandraKala Jewellers Flutter Web frontend on Vercel",
+  "scripts": {
+    "build": "echo 'Serving prebuilt production Flutter Web artifacts from public/'"
+  }
+}

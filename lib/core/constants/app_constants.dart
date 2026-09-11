@@ -8,7 +8,7 @@ class AppConstants {
   // Base API URL (can be overridden with --dart-define=API_URL=...)
   static const String apiBaseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'https://cj-backend-vercel.vercel.app/api',
+    defaultValue: 'https://cj-backend-kappa.vercel.app/api',
   );
 
   // Asset CDN base URL for jewellery pictures
