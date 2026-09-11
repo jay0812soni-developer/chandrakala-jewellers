@@ -251,20 +251,26 @@ class _CheckoutViewState extends State<CheckoutView> {
                       const Text('Payment Method', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 8),
 
+                      // ignore: deprecated_member_use
                       RadioListTile<String>(
                         title: const Text('WhatsApp Confirmation / Store Pickup'),
                         subtitle: const Text('Reserve piece now, pay on delivery or at Khedbrahma store'),
                         value: 'whatsapp',
+                        // ignore: deprecated_member_use
                         groupValue: _paymentMethod,
                         activeColor: AppColors.primaryGold,
+                        // ignore: deprecated_member_use
                         onChanged: (val) => setState(() => _paymentMethod = val!),
                       ),
+                      // ignore: deprecated_member_use
                       RadioListTile<String>(
                         title: const Text('Online Payment / UPI / Netbanking'),
                         subtitle: const Text('Secure payment processed via Razorpay'),
                         value: 'razorpay',
+                        // ignore: deprecated_member_use
                         groupValue: _paymentMethod,
                         activeColor: AppColors.primaryGold,
+                        // ignore: deprecated_member_use
                         onChanged: (val) => setState(() => _paymentMethod = val!),
                       ),
 
