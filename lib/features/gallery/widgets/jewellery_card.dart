@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../wishlist/bloc/wishlist_bloc.dart';
+import '../../wishlist/bloc/wishlist_event.dart';
+import '../../wishlist/bloc/wishlist_state.dart';
 import '../models/jewellery_item.dart';
 
 class JewelleryCard extends StatelessWidget {
@@ -89,6 +93,38 @@ class JewelleryCard extends StatelessWidget {
                             letterSpacing: 0.5,
                           ),
                         ),
+                      ),
+                    ),
+                    // Wishlist Toggle Button
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: BlocBuilder<WishlistBloc, WishlistState>(
+                        builder: (context, wishState) {
+                          final isSaved = wishState.isInWishlist(item.id);
+                          return CircleAvatar(
+                            backgroundColor: Colors.white.withAlpha(220),
+                            radius: 15,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: Icon(
+                                isSaved ? Icons.favorite : Icons.favorite_border,
+                                size: 16,
+                                color: isSaved ? Colors.redAccent : Colors.black87,
+                              ),
+                              tooltip: isSaved ? 'Remove from wishlist' : 'Save to wishlist',
+                              onPressed: () {
+                                context.read<WishlistBloc>().add(ToggleWishlistEvent(item));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isSaved ? 'Removed from wishlist' : 'Saved to wishlist!'),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],

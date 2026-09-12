@@ -141,6 +141,35 @@ class LiveRatesCard extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.copper.withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.inventory_2_outlined, size: 14, color: AppColors.copper),
+                        const SizedBox(width: 6),
+                        Text(
+                          'COPPER 999 FINE: ${CurrencyFormatter.format(standard?.copperRate ?? 950.0)}/KG',
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                    const Text(
+                      'Delivered in 4+ days',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.copper),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );

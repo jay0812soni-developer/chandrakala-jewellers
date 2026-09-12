@@ -10,6 +10,8 @@ import '../bloc/catalogue_bloc.dart';
 import '../bloc/catalogue_state.dart';
 import '../models/catalogue_item.dart';
 
+import '../../../core/widgets/app_scaffold.dart';
+
 class CatalogueView extends StatelessWidget {
   const CatalogueView({super.key});
 
@@ -30,10 +32,9 @@ class CatalogueView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('CUSTOM DESIGN CATALOGUE'),
-      ),
+    return AppScaffold(
+      currentRoute: '/catalogue',
+      title: 'Design Catalogue',
       body: BlocConsumer<CatalogueBloc, CatalogueState>(
         listenWhen: (previous, current) => current is CatalogueError,
         listener: (context, state) {

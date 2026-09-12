@@ -3,7 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cj_jewellers/features/gallery/models/jewellery_item.dart';
 import 'package:cj_jewellers/features/gallery/widgets/jewellery_card.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cj_jewellers/features/wishlist/bloc/wishlist_bloc.dart';
+
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('JewelleryCard renders name, weight, and price properly', (WidgetTester tester) async {
     final item = JewelleryItem(
       id: 1,
@@ -25,13 +33,16 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: SizedBox(
-              width: 180,
-              height: 280,
-              child: JewelleryCard(item: item),
+      BlocProvider<WishlistBloc>(
+        create: (_) => WishlistBloc(),
+        child: MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 180,
+                height: 280,
+                child: JewelleryCard(item: item),
+              ),
             ),
           ),
         ),

@@ -2,9 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/logger_service.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/widgets/app_scaffold.dart';
 import '../bloc/cart_bloc.dart';
 import '../bloc/cart_event.dart';
 import '../bloc/cart_state.dart';
@@ -14,10 +17,9 @@ class CartView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SHOPPING CART'),
-      ),
+    return AppScaffold(
+      currentRoute: '/cart',
+      title: 'Shopping Cart',
       body: BlocConsumer<CartBloc, CartState>(
         listener: (context, state) {
           AppLogger.debug('Cart item count changed: ${state.itemCount}');
@@ -169,12 +171,45 @@ class CartView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 14),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.lock_outline, size: 16),
+                          label: const Text('Proceed to Online Checkout'),
                           onPressed: () => context.push('/checkout'),
-                          child: const Text('Proceed to Checkout'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryGold,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFF25D366), size: 16),
+                          label: const Text('Order via WhatsApp Concierge', style: TextStyle(color: AppColors.textPrimary)),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: () async {
+                            final itemListStr = state.items.map((i) => '• ${i.item.name} (${i.item.weight}g)').join('\n');
+                            final text = Uri.encodeComponent(
+                              '*Order via WhatsApp — ChandraKala Jewellers*\n\n'
+                              'I would like to reserve and purchase the following items:\n'
+                              '$itemListStr\n\n'
+                              '*Estimated Total:* ${CurrencyFormatter.format(state.grandTotal)}\n\n'
+                              'Please hold these pieces for 24 hours while I confirm details.',
+                            );
+                            final url = Uri.parse('https://wa.me/${AppConstants.shopWhatsAppNumber}?text=$text');
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, mode: LaunchMode.externalApplication);
+                            }
+                          },
                         ),
                       ),
                     ],

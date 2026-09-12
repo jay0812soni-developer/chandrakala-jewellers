@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/blog/views/blog_list_view.dart';
+import 'features/blog/views/blog_post_view.dart';
 import 'features/cart/bloc/cart_bloc.dart';
+import 'features/cart/views/cart_view.dart';
 import 'features/catalogue/bloc/catalogue_bloc.dart';
 import 'features/catalogue/bloc/catalogue_event.dart';
 import 'features/catalogue/repository/catalogue_repository.dart';
 import 'features/catalogue/views/catalogue_view.dart';
-import 'features/cart/views/cart_view.dart';
 import 'features/checkout/views/checkout_view.dart';
 import 'features/gallery/bloc/gallery_bloc.dart';
 import 'features/gallery/bloc/gallery_event.dart';
@@ -15,10 +17,16 @@ import 'features/gallery/models/jewellery_item.dart';
 import 'features/gallery/repository/gallery_repository.dart';
 import 'features/gallery/views/gallery_view.dart';
 import 'features/home/views/home_view.dart';
+import 'features/info/views/about_view.dart';
+import 'features/info/views/contact_view.dart';
+import 'features/info/views/follow_us_view.dart';
 import 'features/product_detail/views/product_detail_view.dart';
 import 'features/rates/bloc/rates_bloc.dart';
 import 'features/rates/bloc/rates_event.dart';
 import 'features/rates/repository/rates_repository.dart';
+import 'features/wishlist/bloc/wishlist_bloc.dart';
+import 'features/wishlist/bloc/wishlist_event.dart';
+import 'features/wishlist/views/wishlist_view.dart';
 
 final GoRouter _router = GoRouter(
   initialLocation: '/',
@@ -39,10 +47,8 @@ final GoRouter _router = GoRouter(
       path: '/product/:id',
       builder: (context, state) {
         final item = state.extra as JewelleryItem?;
-        if (item == null) {
-          return const Scaffold(body: Center(child: Text('Product not found')));
-        }
-        return ProductDetailView(item: item);
+        final idParam = int.tryParse(state.pathParameters['id'] ?? '');
+        return ProductDetailView(item: item, itemId: idParam);
       },
     ),
     GoRoute(
@@ -52,6 +58,33 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/checkout',
       builder: (context, state) => const CheckoutView(),
+    ),
+    GoRoute(
+      path: '/wishlist',
+      builder: (context, state) => const WishlistView(),
+    ),
+    GoRoute(
+      path: '/blog',
+      builder: (context, state) => const BlogListView(),
+    ),
+    GoRoute(
+      path: '/blog/:slug',
+      builder: (context, state) {
+        final slug = state.pathParameters['slug'] ?? 'jewellery-care-tips';
+        return BlogPostView(slug: slug);
+      },
+    ),
+    GoRoute(
+      path: '/about',
+      builder: (context, state) => const AboutView(),
+    ),
+    GoRoute(
+      path: '/contact',
+      builder: (context, state) => const ContactView(),
+    ),
+    GoRoute(
+      path: '/follow-us',
+      builder: (context, state) => const FollowUsView(),
     ),
   ],
 );
@@ -86,6 +119,9 @@ class CJApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (_) => CartBloc(),
+          ),
+          BlocProvider(
+            create: (_) => WishlistBloc()..add(const LoadWishlistEvent()),
           ),
         ],
         child: MaterialApp.router(

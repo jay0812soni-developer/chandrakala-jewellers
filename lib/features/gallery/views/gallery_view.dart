@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/logger_service.dart';
+import '../../../core/widgets/app_scaffold.dart';
 import '../bloc/gallery_bloc.dart';
 import '../bloc/gallery_event.dart';
 import '../bloc/gallery_state.dart';
@@ -13,17 +14,9 @@ class GalleryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('JEWELLERY GALLERY'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_bag_outlined),
-            onPressed: () => context.push('/cart'),
-          ),
-        ],
-      ),
-      // BlocConsumer provides BlocListener for side effects + BlocBuilder for rendering
+    return AppScaffold(
+      currentRoute: '/gallery',
+      title: 'Shop Gallery',
       body: BlocConsumer<GalleryBloc, GalleryState>(
         listenWhen: (previous, current) => current is GalleryError,
         listener: (context, state) {
