@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/cj_image.dart';
 import '../../blog/models/blog_post.dart';
 import '../../cart/bloc/cart_bloc.dart';
 import '../../cart/bloc/cart_event.dart';
@@ -604,11 +604,16 @@ class HomeView extends StatelessWidget {
     double price,
     NumberFormat currencyFormatter,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.cardBorder, width: 1),
+        side: BorderSide(
+          color: isDark ? const Color(0xFF2E3544) : AppColors.cardBorder,
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -619,14 +624,9 @@ class HomeView extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () => context.push('/product/${item.id}', extra: item),
-                  child: CachedNetworkImage(
-                    imageUrl: item.fullImageUrl,
+                  child: CJImage(
+                    imagePath: item.image,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(color: AppColors.champagne),
-                    errorWidget: (context, url, error) => Container(
-                      color: AppColors.champagne,
-                      child: const Icon(Icons.diamond_outlined, color: AppColors.primaryGold, size: 40),
-                    ),
                   ),
                 ),
                 if (item.isSoldOut)
@@ -641,6 +641,24 @@ class HomeView extends StatelessWidget {
                       ),
                       child: const Text('Sold Out', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
+                  )
+                else
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: item.metalType == 'gold'
+                            ? AppColors.primaryGold
+                            : (item.metalType == 'silver_925' ? const Color(0xFF4A5568) : const Color(0xFF718096)),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        item.metalType == 'gold' ? '916 GOLD' : (item.metalType == 'silver_925' ? '925 SILVER' : 'SILVER'),
+                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 // Wishlist Toggle Button
                 Positioned(
@@ -650,14 +668,14 @@ class HomeView extends StatelessWidget {
                     builder: (context, wishState) {
                       final isSaved = wishState.isInWishlist(item.id);
                       return CircleAvatar(
-                        backgroundColor: Colors.white.withAlpha(230),
+                        backgroundColor: (isDark ? const Color(0xFF1F2430) : Colors.white).withAlpha(230),
                         radius: 16,
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           icon: Icon(
                             isSaved ? Icons.favorite : Icons.favorite_border,
                             size: 18,
-                            color: isSaved ? Colors.redAccent : Colors.black87,
+                            color: isSaved ? Colors.redAccent : (isDark ? Colors.white : Colors.black87),
                           ),
                           tooltip: isSaved ? 'Remove from wishlist' : 'Add to wishlist',
                           onPressed: () {
@@ -696,7 +714,11 @@ class HomeView extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   currencyFormatter.format(price),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.darkGold),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: isDark ? const Color(0xFFF0D78C) : AppColors.darkGold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 if (item.isSoldOut)
@@ -729,21 +751,26 @@ class HomeView extends StatelessWidget {
                             side: const BorderSide(color: AppColors.primaryGold),
                             padding: const EdgeInsets.symmetric(vertical: 6),
                           ),
-                          child: const Text('Add Cart', style: TextStyle(fontSize: 11, color: AppColors.darkGold)),
+                          child: Text(
+                            'Add Cart',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark ? const Color(0xFFF0D78C) : AppColors.darkGold,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            context.read<CartBloc>().add(AddToCartEvent(item));
-                            context.go('/checkout');
+                            context.push('/buynow', extra: item);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryGold,
                             padding: const EdgeInsets.symmetric(vertical: 6),
                           ),
-                          child: const Text('Buy Now', style: TextStyle(fontSize: 11, color: Colors.white)),
+                          child: const Text('Buy Now', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],

@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'features/account/views/account_view.dart';
 import 'features/blog/views/blog_list_view.dart';
 import 'features/blog/views/blog_post_view.dart';
 import 'features/cart/bloc/cart_bloc.dart';
@@ -11,6 +12,7 @@ import 'features/catalogue/bloc/catalogue_bloc.dart';
 import 'features/catalogue/bloc/catalogue_event.dart';
 import 'features/catalogue/repository/catalogue_repository.dart';
 import 'features/catalogue/views/catalogue_view.dart';
+import 'features/checkout/views/buynow_view.dart';
 import 'features/checkout/views/checkout_view.dart';
 import 'features/gallery/bloc/gallery_bloc.dart';
 import 'features/gallery/bloc/gallery_event.dart';
@@ -25,6 +27,9 @@ import 'features/product_detail/views/product_detail_view.dart';
 import 'features/rates/bloc/rates_bloc.dart';
 import 'features/rates/bloc/rates_event.dart';
 import 'features/rates/repository/rates_repository.dart';
+import 'features/rates_info/views/gold_rate_view.dart';
+import 'features/rates_info/views/jewellers_view.dart';
+import 'features/splash/views/splash_view.dart';
 import 'features/wishlist/bloc/wishlist_bloc.dart';
 import 'features/wishlist/bloc/wishlist_event.dart';
 import 'features/wishlist/views/wishlist_view.dart';
@@ -34,6 +39,18 @@ final GoRouter _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
+      builder: (context, state) => const SplashView(),
+    ),
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashView(),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const HomeView(),
+    ),
+    GoRoute(
+      path: '/index1',
       builder: (context, state) => const HomeView(),
     ),
     GoRoute(
@@ -41,7 +58,15 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const GalleryView(),
     ),
     GoRoute(
+      path: '/shop',
+      builder: (context, state) => const GalleryView(),
+    ),
+    GoRoute(
       path: '/catalogue',
+      builder: (context, state) => const CatalogueView(),
+    ),
+    GoRoute(
+      path: '/Catalogue',
       builder: (context, state) => const CatalogueView(),
     ),
     GoRoute(
@@ -61,6 +86,14 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const CheckoutView(),
     ),
     GoRoute(
+      path: '/buynow',
+      builder: (context, state) {
+        final item = state.extra as JewelleryItem?;
+        final idParam = int.tryParse(state.uri.queryParameters['id'] ?? '');
+        return BuyNowView(item: item, itemId: idParam);
+      },
+    ),
+    GoRoute(
       path: '/wishlist',
       builder: (context, state) => const WishlistView(),
     ),
@@ -76,6 +109,13 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
+      path: '/blog-post',
+      builder: (context, state) {
+        final slug = state.uri.queryParameters['slug'] ?? 'jewellery-care-tips';
+        return BlogPostView(slug: slug);
+      },
+    ),
+    GoRoute(
       path: '/about',
       builder: (context, state) => const AboutView(),
     ),
@@ -86,6 +126,18 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/follow-us',
       builder: (context, state) => const FollowUsView(),
+    ),
+    GoRoute(
+      path: '/gold-rate-khedbrahma',
+      builder: (context, state) => const GoldRateView(),
+    ),
+    GoRoute(
+      path: '/jewellers-in-khedbrahma',
+      builder: (context, state) => const JewellersInKhedbrahmaView(),
+    ),
+    GoRoute(
+      path: '/account',
+      builder: (context, state) => const AccountView(),
     ),
   ],
 );

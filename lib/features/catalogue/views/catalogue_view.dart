@@ -1,16 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/logger_service.dart';
+import '../../../core/widgets/app_scaffold.dart';
+import '../../../core/widgets/cj_image.dart';
 import '../bloc/catalogue_bloc.dart';
 import '../bloc/catalogue_state.dart';
 import '../models/catalogue_item.dart';
-
-import '../../../core/widgets/app_scaffold.dart';
 
 class CatalogueView extends StatelessWidget {
   const CatalogueView({super.key});
@@ -32,6 +31,8 @@ class CatalogueView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AppScaffold(
       currentRoute: '/catalogue',
       title: 'Design Catalogue',
@@ -70,9 +71,18 @@ class CatalogueView extends StatelessWidget {
                 return RepaintBoundary(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF161A22) : Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF2E3544) : AppColors.cardBorder,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(isDark ? 60 : 10),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,23 +90,10 @@ class CatalogueView extends StatelessWidget {
                         Expanded(
                           child: ClipRRect(
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                            child: CachedNetworkImage(
-                              imageUrl: item.fullImageUrl,
+                            child: CJImage(
+                              imagePath: item.imageFilename,
                               fit: BoxFit.cover,
                               width: double.infinity,
-                              memCacheWidth: 400,
-                              memCacheHeight: 400,
-                              placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey.shade200,
-                                highlightColor: Colors.grey.shade100,
-                                child: Container(color: Colors.white),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: AppColors.lightGold,
-                                child: const Center(
-                                  child: Icon(Icons.palette_outlined, color: AppColors.darkGold, size: 36),
-                                ),
-                              ),
                             ),
                           ),
                         ),
@@ -109,7 +106,11 @@ class CatalogueView extends StatelessWidget {
                                 item.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                style: GoogleFonts.playfairDisplay(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                  color: isDark ? Colors.white : AppColors.textPrimary,
+                                ),
                               ),
                               const SizedBox(height: 6),
                               SizedBox(
@@ -117,9 +118,10 @@ class CatalogueView extends StatelessWidget {
                                 height: 32,
                                 child: ElevatedButton.icon(
                                   icon: const Icon(Icons.chat, size: 14, color: Colors.white),
-                                  label: const Text('Enquire', style: TextStyle(fontSize: 11)),
+                                  label: const Text('Enquire on WhatsApp', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF25D366),
+                                    foregroundColor: Colors.white,
                                     padding: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                   ),

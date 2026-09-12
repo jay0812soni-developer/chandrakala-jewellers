@@ -20,6 +20,8 @@ class CurrencyFormatter {
         : _inrFormatter.format(amount);
   }
 
+  static String formatINR(num? amount) => format(amount);
+
   static String formatWeight(num? weight) {
     if (weight == null) return '0.000 g';
     return '${weight.toStringAsFixed(3)} g';
