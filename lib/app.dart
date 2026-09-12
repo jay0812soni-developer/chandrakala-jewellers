@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
 import 'features/blog/views/blog_list_view.dart';
 import 'features/blog/views/blog_post_view.dart';
 import 'features/cart/bloc/cart_bloc.dart';
@@ -123,12 +124,21 @@ class CJApp extends StatelessWidget {
           BlocProvider(
             create: (_) => WishlistBloc()..add(const LoadWishlistEvent()),
           ),
+          BlocProvider(
+            create: (_) => ThemeCubit(),
+          ),
         ],
-        child: MaterialApp.router(
-          title: 'ChandraKala Jewellers',
-          theme: AppTheme.lightTheme,
-          routerConfig: _router,
-          debugShowCheckedModeBanner: false,
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return MaterialApp.router(
+              title: 'ChandraKala Jewellers',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              routerConfig: _router,
+              debugShowCheckedModeBanner: false,
+            );
+          },
         ),
       ),
     );

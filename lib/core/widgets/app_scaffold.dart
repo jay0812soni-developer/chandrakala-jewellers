@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../constants/app_colors.dart';
+import '../theme/theme_cubit.dart';
 import '../../features/cart/bloc/cart_bloc.dart';
 import '../../features/cart/bloc/cart_state.dart';
 import '../../features/wishlist/bloc/wishlist_bloc.dart';
@@ -200,6 +201,22 @@ class AppScaffold extends StatelessWidget {
               );
             },
           ),
+          // Theme Mode Toggle (Matches PHP theme switcher)
+          BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              final isDark = themeMode == ThemeMode.dark ||
+                  (themeMode == ThemeMode.system &&
+                      MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+              return IconButton(
+                icon: Icon(
+                  isDark ? Icons.light_mode_rounded : Icons.dark_mode_outlined,
+                  color: isDark ? AppColors.darkPrimaryGold : AppColors.textPrimary,
+                ),
+                tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+              );
+            },
+          ),
           const SizedBox(width: 4),
         ],
       ),
@@ -348,6 +365,23 @@ class AppScaffold extends StatelessWidget {
                       if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
                     },
                   ),
+                  const Divider(height: 1),
+                  BlocBuilder<ThemeCubit, ThemeMode>(
+                    builder: (context, themeMode) {
+                      final isDark = themeMode == ThemeMode.dark ||
+                          (themeMode == ThemeMode.system &&
+                              MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+                      return SwitchListTile(
+                        secondary: Icon(
+                          isDark ? Icons.dark_mode : Icons.light_mode,
+                          color: AppColors.primaryGold,
+                        ),
+                        title: const Text('Dark Mode', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        value: isDark,
+                        onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -359,8 +393,10 @@ class AppScaffold extends StatelessWidget {
           ? NavigationBar(
               selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
               onDestinationSelected: (idx) => _onBottomNavTapped(context, idx),
-              backgroundColor: Colors.white,
-              indicatorColor: AppColors.champagne,
+              backgroundColor: Theme.of(context).cardTheme.color ?? Colors.white,
+              indicatorColor: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.darkGoldSurface
+                  : AppColors.champagne,
               surfaceTintColor: Colors.transparent,
               elevation: 4,
               destinations: [
