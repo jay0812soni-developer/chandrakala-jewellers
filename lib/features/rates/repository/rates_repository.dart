@@ -6,11 +6,20 @@ class RatesRepository {
   final ApiClient _client = ApiClient();
 
   Future<RateBundle> getLatestRates() async {
-    final response = await _client.dio.get('/rates/latest');
-    if (response.statusCode == 200 && response.data['ok'] == true) {
-      return RateBundle.fromJson(response.data['data'] as Map<String, dynamic>);
+    try {
+      final response = await _client.dio.get('/rates/latest');
+      if (response.statusCode == 200 &&
+          response.data is Map &&
+          response.data['ok'] == true &&
+          response.data['data'] is Map) {
+        return RateBundle.fromJson(response.data['data'] as Map<String, dynamic>);
+      }
+      AppLogger.warning(
+        'Rates API did not return live board rates (${response.statusCode}).',
+      );
+    } catch (e) {
+      AppLogger.warning('Rates API unavailable ($e).');
     }
-    AppLogger.warning('Rates API did not return live board rates.');
-    throw Exception('Metal rates are not available on the preview site yet.');
+    throw Exception('Live rates are waiting for the database.');
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/utils/currency_formatter.dart';
 import '../bloc/rates_bloc.dart';
 import '../bloc/rates_event.dart';
 import '../bloc/rates_state.dart';
@@ -11,22 +10,7 @@ class LiveRatesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<RatesBloc, RatesState>(
-      listenWhen: (previous, current) => current is RatesError,
-      listener: (context, state) {
-        if (state is RatesError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to load live rates: ${state.message}'),
-              action: SnackBarAction(
-                label: 'Retry',
-                textColor: AppColors.primaryGold,
-                onPressed: () => context.read<RatesBloc>().add(const FetchRatesEvent()),
-              ),
-            ),
-          );
-        }
-      },
+    return BlocBuilder<RatesBloc, RatesState>(
       builder: (context, state) {
         if (state is RatesLoading) {
           return Container(
@@ -44,10 +28,11 @@ class LiveRatesCard extends StatelessWidget {
         }
 
         final standard = state is RatesLoaded ? state.bundle.standard : null;
-
-        final goldRate = standard?.goldRate ?? 15100.0;
-        final silverRate = standard?.silverRate ?? 237.0;
-        final silver925Rate = standard?.silver925Rate ?? 650.0;
+        final awaitingBoard = standard == null;
+        final goldRate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.goldRate);
+        final silverRate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.silverRate);
+        final silver925Rate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.silver925Rate);
+        final copperRate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.copperRate);
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -116,7 +101,7 @@ class LiveRatesCard extends StatelessWidget {
                   Expanded(
                     child: _buildRatePill(
                       title: 'GOLD (1g)',
-                      rate: CurrencyFormatter.format(goldRate),
+                      rate: goldRate,
                       subtitle: '22K Hallmark',
                       accentColor: AppColors.primaryGold,
                     ),
@@ -125,7 +110,7 @@ class LiveRatesCard extends StatelessWidget {
                   Expanded(
                     child: _buildRatePill(
                       title: 'SILVER (1g)',
-                      rate: CurrencyFormatter.format(silverRate),
+                      rate: silverRate,
                       subtitle: 'Pure 99.9%',
                       accentColor: AppColors.silver,
                     ),
@@ -134,7 +119,7 @@ class LiveRatesCard extends StatelessWidget {
                   Expanded(
                     child: _buildRatePill(
                       title: '925 SILVER',
-                      rate: CurrencyFormatter.format(silver925Rate),
+                      rate: silver925Rate,
                       subtitle: 'Fine Silver',
                       accentColor: AppColors.darkGold,
                     ),
@@ -158,7 +143,7 @@ class LiveRatesCard extends StatelessWidget {
                         const Icon(Icons.inventory_2_outlined, size: 14, color: AppColors.copper),
                         const SizedBox(width: 6),
                         Text(
-                          'COPPER 999 FINE: ${CurrencyFormatter.format(standard?.copperRate ?? 950.0)}/KG',
+                          'COPPER 999 FINE: $copperRate/KG',
                           style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                         ),
                       ],
@@ -170,6 +155,13 @@ class LiveRatesCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (awaitingBoard) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  'Live board will fill in after PostgreSQL is connected. chandrakalajewellers.in remains the live shop.',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
+                ),
+              ],
             ],
           ),
         );
