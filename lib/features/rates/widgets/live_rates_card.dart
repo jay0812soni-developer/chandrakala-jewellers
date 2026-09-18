@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../bloc/rates_bloc.dart';
 import '../bloc/rates_event.dart';
 import '../bloc/rates_state.dart';
@@ -27,12 +28,12 @@ class LiveRatesCard extends StatelessWidget {
           );
         }
 
-        final standard = state is RatesLoaded ? state.bundle.standard : null;
-        final awaitingBoard = standard == null;
-        final goldRate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.goldRate);
-        final silverRate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.silverRate);
-        final silver925Rate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.silver925Rate);
-        final copperRate = awaitingBoard ? '—' : CurrencyFormatter.format(standard.copperRate);
+        final loaded = state is RatesLoaded ? state.bundle.standard : null;
+        final awaitingBoard = loaded == null;
+        final goldRate = loaded != null ? CurrencyFormatter.format(loaded.goldRate) : '—';
+        final silverRate = loaded != null ? CurrencyFormatter.format(loaded.silverRate) : '—';
+        final silver925Rate = loaded != null ? CurrencyFormatter.format(loaded.silver925Rate) : '—';
+        final copperRate = loaded != null ? CurrencyFormatter.format(loaded.copperRate) : '—';
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
