@@ -5,118 +5,6 @@ import '../models/jewellery_item.dart';
 class GalleryRepository {
   final ApiClient _client = ApiClient();
 
-  // In-stock items fallback from ChandraKala Jewellers store
-  static final List<JewelleryItem> _fallbackItems = [
-    JewelleryItem(
-      id: 110,
-      name: 'Pendent Butti Set',
-      image: 'jewelry1.jpg',
-      description: 'New design handcrafted to order in 22K, 20K, and 18K hallmark gold.',
-      purity: '22K 916',
-      stone: 'Cubic Zirconia',
-      category: 'Necklace Sets',
-      sku: 'CJ-G-110',
-      dimensions: 'Medium',
-      weight: 11.640,
-      cachedPrice: 224977.92,
-      metalType: 'gold',
-      isFavourite: true,
-      isSoldOut: false,
-      useManualRates: false,
-      createdAt: DateTime.now(),
-    ),
-    JewelleryItem(
-      id: 109,
-      name: 'Gold Set with Earrings',
-      image: 'necklace.jpg',
-      description: 'Exquisite bridal necklace set with matching butti in 916 gold.',
-      purity: '22K 916',
-      stone: 'Kundan',
-      category: 'Bridal Sets',
-      sku: 'CJ-G-109',
-      dimensions: 'Large',
-      weight: 22.210,
-      cachedPrice: 349390.17,
-      metalType: 'gold',
-      isFavourite: true,
-      isSoldOut: false,
-      useManualRates: false,
-      createdAt: DateTime.now(),
-    ),
-    JewelleryItem(
-      id: 108,
-      name: 'Chain with Pearl',
-      image: 'jewelry2.jpg',
-      description: 'Elegant 916 yellow gold chain adorned with natural cultured pearls.',
-      purity: '22K 916',
-      stone: 'Pearl',
-      category: 'Chains',
-      sku: 'CJ-G-108',
-      dimensions: '18 inches',
-      weight: 7.000,
-      cachedPrice: 135296.00,
-      metalType: 'gold',
-      isFavourite: true,
-      isSoldOut: false,
-      useManualRates: false,
-      createdAt: DateTime.now(),
-    ),
-    JewelleryItem(
-      id: 85,
-      name: '925 Silver Folding Ring',
-      image: 'jewelry3.jpg',
-      description: 'Dual-style folding ring crafted in fine 925 sterling silver.',
-      purity: '925 Silver',
-      stone: 'American Diamond',
-      category: 'Rings',
-      sku: 'CJ-S-085',
-      dimensions: 'Adjustable',
-      weight: 5.400,
-      cachedPrice: 3920.40,
-      metalType: 'silver_925',
-      isFavourite: true,
-      isSoldOut: false,
-      useManualRates: false,
-      createdAt: DateTime.now(),
-    ),
-    JewelleryItem(
-      id: 64,
-      name: 'Silver Fancy Kada',
-      image: 'jewelry5.jpg',
-      description: 'Heavy traditional solid gents silver kada with delicate carvings.',
-      purity: '99.9% Silver',
-      stone: 'None',
-      category: 'Kada',
-      sku: 'CJ-S-064',
-      dimensions: 'Size 2.8',
-      weight: 31.800,
-      cachedPrice: 9811.89,
-      metalType: 'silver',
-      isFavourite: false,
-      isSoldOut: false,
-      useManualRates: false,
-      createdAt: DateTime.now(),
-    ),
-    JewelleryItem(
-      id: 65,
-      name: 'Royal Gold Bangle Pair',
-      image: 'jewelry6.jpg',
-      description: 'Handcrafted traditional filigree bangles in 22K 916 gold.',
-      purity: '22K 916',
-      stone: 'None',
-      category: 'Bangles',
-      sku: 'CJ-G-065',
-      dimensions: 'Size 2.6',
-      weight: 18.500,
-      cachedPrice: 285000.00,
-      metalType: 'gold',
-      isFavourite: true,
-      isSoldOut: false,
-      useManualRates: false,
-      createdAt: DateTime.now(),
-    ),
-  ];
-
   Future<List<JewelleryItem>> getItems({
     String metalType = 'all',
     String? category,
@@ -147,60 +35,23 @@ class GalleryRepository {
 
       if (response.statusCode == 200 && response.data['ok'] == true) {
         final List list = response.data['data'] as List? ?? [];
-        return list.map((json) => JewelleryItem.fromJson(json)).toList();
+        return list.map((json) => JewelleryItem.fromJson(json as Map<String, dynamic>)).toList();
       }
     } catch (e) {
-      AppLogger.warning(
-        'Backend inventory API unreachable ($e). Serving local cached CJ pieces.',
-      );
+      AppLogger.warning('Inventory API unavailable ($e). Live shop is still https://chandrakalajewellers.in');
     }
-
-    // Filter fallback items client-side
-    var filtered = _fallbackItems;
-    if (metalType != 'all') {
-      filtered = filtered.where((item) => item.metalType == metalType).toList();
-    }
-    if (search != null && search.trim().isNotEmpty) {
-      final query = search.trim().toLowerCase();
-      filtered = filtered
-          .where((item) =>
-              item.name.toLowerCase().contains(query) ||
-              item.description.toLowerCase().contains(query))
-          .toList();
-    }
-    return filtered;
+    return [];
   }
 
   Future<Map<String, dynamic>> getItemDetails(int id) async {
     try {
       final response = await _client.dio.get('/inventory/$id');
       if (response.statusCode == 200 && response.data['ok'] == true) {
-        return response.data['data'] as Map<String, dynamic>;
+        return Map<String, dynamic>.from(response.data['data'] as Map);
       }
     } catch (e) {
-      AppLogger.warning('Item details API unreachable ($e). Serving cached item.');
+      AppLogger.warning('Product API unavailable ($e).');
     }
-    final match = _fallbackItems.firstWhere(
-      (item) => item.id == id,
-      orElse: () => _fallbackItems.first,
-    );
-    return {
-      'id': match.id,
-      'name': match.name,
-      'image': match.image,
-      'description': match.description,
-      'purity': match.purity,
-      'stone': match.stone,
-      'category': match.category,
-      'sku': match.sku,
-      'dimensions': match.dimensions,
-      'weight': match.weight,
-      'cached_price': match.cachedPrice,
-      'metal_type': match.metalType,
-      'is_favourite': match.isFavourite,
-      'is_sold_out': match.isSoldOut,
-      'extra_images': [],
-      'reviews': [],
-    };
+    return {};
   }
 }

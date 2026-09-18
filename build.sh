@@ -24,8 +24,14 @@ flutter pub get
 
 # 3. Build web release with CanvasKit and API URL injection
 echo "Building Flutter Web release..."
+API_URL="${API_URL:-https://cj-backend-kappa.vercel.app/api}"
+CDN_BASE_URL="${CDN_BASE_URL:-https://chandrakalajewellers.in/uploads/}"
+CATALOGUE_CDN_URL="${CATALOGUE_CDN_URL:-https://chandrakalajewellers.in/catalogue/}"
+
 flutter build web --release \
-  --dart-define=API_URL=https://cj-backend-kappa.vercel.app/api
+  --dart-define=API_URL="$API_URL" \
+  --dart-define=CDN_BASE_URL="$CDN_BASE_URL" \
+  --dart-define=CATALOGUE_CDN_URL="$CATALOGUE_CDN_URL"
 
 echo "=============================================="
 echo " Build successful! Output located in build/web"
